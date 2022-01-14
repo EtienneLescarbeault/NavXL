@@ -48,8 +48,8 @@ def timeStampToDate(milliseconds):
 #Method to run all the scripts.
 def parse_data(data):
     activity_points = []
+    visit_points = []
     for data_unit in data["timelineObjects"]:
-      if "activitySegment" in data_unit.keys():
-        activity_points.append(activitySegment(data_unit["activitySegment"]))
+        if "activitySegment" in data_unit.keys():
+            activity_points.append(activitySegment(data_unit["activitySegment"]))
     return activity_points
-    
