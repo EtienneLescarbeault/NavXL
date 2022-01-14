@@ -1,5 +1,5 @@
 import json
-from utils import parse_data
+from utils import parseData, getAllLatLong
 from geocodio import GeocodioClient
 from settings import GEOCODIO_API_KEY
 
@@ -12,7 +12,10 @@ fileName = "../data/2021_OCTOBER.json"
 with open(fileName, 'r', encoding="cp866") as f:
     data = json.load(f)
 
-parsed_data = parse_data(data)
+parsed_data = parseData(data)
 
-a = geocodio_client.geocode("42370 Bob Hope Drive, Rancho Mirage CA")
-print(a)
+
+all_lat_long = getAllLatLong(parsed_data)
+locations = geocodio_client.reverse(all_lat_long)
+
+print(locations)

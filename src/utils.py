@@ -46,10 +46,19 @@ def timeStampToDate(milliseconds):
     return date
 
 #Method to run all the scripts.
-def parse_data(data):
+def parseData(data):
     activity_points = []
-    visit_points = []
     for data_unit in data["timelineObjects"]:
         if "activitySegment" in data_unit.keys():
             activity_points.append(activitySegment(data_unit["activitySegment"]))
     return activity_points
+
+def getAllLatLong(parsed_data):
+    """
+    Alternates between start and end points of each activity segment.
+    """
+    lat_lon = []
+    for point in parsed_data:
+        lat_lon.append((point["start_point"]["lat"], point["start_point"]["lon"]))
+        lat_lon.append((point["end_point"]["lat"], point["end_point"]["lon"]))
+    return lat_lon
