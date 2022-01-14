@@ -2,8 +2,9 @@ import json
 from utils import parse_data
 
 # test
-fileName = "2021_OCTOBER.json"
-with open(f"data/{fileName}") as f:
+fileName = "../data/2021_OCTOBER.json"
+with open(fileName, 'r', encoding="cp866") as f:
     data = json.load(f)
 
-parse_data(data)
+a = parse_data(data)
+print(a)
