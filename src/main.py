@@ -1,7 +1,9 @@
 import json
+import random
 from utils import parseData, getAllLatLong
 from geocodio import GeocodioClient
 from settings import GEOCODIO_API_KEY
+import xlsxwriter
 
 # init
 geocodio_client = GeocodioClient(GEOCODIO_API_KEY)
@@ -13,15 +15,34 @@ with open(fileName, 'r', encoding="cp866") as f:
     data = json.load(f)
 
 parsed_data = parseData(data)
+parsed_data = random.sample(parsed_data, 5)
+
+all_lat_long = getAllLatLong(parsed_data)
+locations = geocodio_client.reverse(all_lat_long)
+
+j = 0
+for i, formatted_address in enumerate(locations.formatted_addresses):
+    if i % 2 == 0: # start point
+        parsed_data[j]["start_point"]["formatted_address"] = formatted_address
+    else: # end point
+        parsed_data[j]["end_point"]["formatted_address"] = formatted_address
+        j += 1
 
 
-#all_lat_long = getAllLatLong(parsed_data)
-#locations = geocodio_client.reverse(all_lat_long)
-with open("../data/EMULATED_RESP.json", 'r') as f:
-    locations = json.load(f)
+# Create a workbook and add a worksheet.
+workbook = xlsxwriter.Workbook('test.xlsx')
+worksheet = workbook.add_worksheet()
 
-res_arr = locations["results"]
-for i, res_elem in enumerate(res_arr):
-    address_elem = res_elem["response"]["results"][0] # Most likely address is the first in the list
-    formatted_address = address_elem["formatted_address"]
-    print(formatted_address)
+col_names = ["ID", "Date", "Depart", "Arrivee", "Distance (Km)"]
+for i, c in enumerate(col_names):
+    worksheet.write(0, i, c)
+
+for j, line in enumerate(parsed_data):
+    row = j + 1
+    worksheet.write(row, 0, row)
+    worksheet.write(row, 1, line["start_point"]["time_stamp"])
+    worksheet.write(row, 2, line["start_point"]["formatted_address"])
+    worksheet.write(row, 3, line["end_point"]["formatted_address"])
+    worksheet.write(row, 4, line["end_point"]["distance"]/1000)
+
+workbook.close()
