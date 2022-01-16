@@ -37,11 +37,12 @@ worksheet = workbook.add_worksheet()
 
 col_names = ["ID", "Date", "Depart", "Arrivee", "Distance (Km)"]
 for i, c in enumerate(col_names):
-    worksheet.write(0, i, c)
+    worksheet.write(0, i, c, bold_format)
 
+print(parsed_data)
 for j, line in enumerate(parsed_data):
     row = j + 1
-    worksheet.write_number(row, 0, row, bold_format)
+    worksheet.write_number(row, 0, row)
     worksheet.write(row, 1, line["start_point"]["time_stamp"], date_format)
     worksheet.write_string(row, 2, line["start_point"]["formatted_address"])
     worksheet.write_string(row, 3, line["end_point"]["formatted_address"])
