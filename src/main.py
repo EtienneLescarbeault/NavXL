@@ -31,6 +31,8 @@ for i, formatted_address in enumerate(locations.formatted_addresses):
 
 # Create a workbook and add a worksheet.
 workbook = xlsxwriter.Workbook('test.xlsx')
+date_format = workbook.add_format({'num_format': 'dd/mm/yyyy hh:mm:ss'})
+bold_format = workbook.add_format({'bold': True})
 worksheet = workbook.add_worksheet()
 
 col_names = ["ID", "Date", "Depart", "Arrivee", "Distance (Km)"]
@@ -39,10 +41,10 @@ for i, c in enumerate(col_names):
 
 for j, line in enumerate(parsed_data):
     row = j + 1
-    worksheet.write(row, 0, row)
-    worksheet.write(row, 1, line["start_point"]["time_stamp"])
-    worksheet.write(row, 2, line["start_point"]["formatted_address"])
-    worksheet.write(row, 3, line["end_point"]["formatted_address"])
-    worksheet.write(row, 4, line["end_point"]["distance"]/1000)
+    worksheet.write_number(row, 0, row, bold_format)
+    worksheet.write(row, 1, line["start_point"]["time_stamp"], date_format)
+    worksheet.write_string(row, 2, line["start_point"]["formatted_address"])
+    worksheet.write_string(row, 3, line["end_point"]["formatted_address"])
+    worksheet.write_number(row, 4, line["end_point"]["distance"]/1000)
 
 workbook.close()

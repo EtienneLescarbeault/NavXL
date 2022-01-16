@@ -13,10 +13,9 @@ def activitySegment(activitySegment_dict):
 #Set start point of activity as a list.
 def activityStartPoint(activitySegment_dict):
     trip_id = activitySegment_dict["duration"]["startTimestampMs"]
-    order = 1
     lat = activitySegment_dict["startLocation"]["latitudeE7"]
     lon = activitySegment_dict["startLocation"]["longitudeE7"]
-    time_stamp = timeStampToDate(int(trip_id))
+    time_stamp = timeStampToExcelDate(int(trip_id))
     distance = activitySegment_dict.get("distance", 0)
 
     #Formatting variables
@@ -35,15 +34,15 @@ def activityEndPoint(activitySegment_dict):
     #Formatting variables
     lat = int(lat)/1e7
     lon = int(lon)/1e7
-    time_stamp = timeStampToDate(int(time_stamp))
+    time_stamp = timeStampToExcelDate(int(time_stamp))
     end_point = {"trip_id": trip_id, "lat": lat, "lon": lon, "time_stamp": time_stamp, "distance": distance}
     return end_point
 
 #Convert milliseconds timestamp into a readable date.
-def timeStampToDate(milliseconds):
-    date = datetime.datetime.fromtimestamp(milliseconds/1000.0)
-    date = date.strftime('%Y-%m-%d %H:%M:%S')
-    return date
+def timeStampToExcelDate(milliseconds):
+    temp = datetime.datetime(1899, 12, 30)    # Note, not 31st Dec but 30th!
+    delta = datetime.datetime.fromtimestamp(milliseconds/1000) - temp
+    return float(delta.days) + (float(delta.seconds) / 86400)
 
 #Method to run all the scripts.
 def parseData(data):
