@@ -1,4 +1,6 @@
 import datetime
+import os
+import sys
 
 """
 Adapted from https://github.com/gabrielgz92/location_history_data/blob/master/key_value_parsing.py
@@ -61,3 +63,21 @@ def getAllLatLong(parsed_data):
         lat_lon.append((point["start_point"]["lat"], point["start_point"]["lon"]))
         lat_lon.append((point["end_point"]["lat"], point["end_point"]["lon"]))
     return lat_lon
+
+def getJSONFiles():
+    current_dir = sys.argv[1]
+    json_file_names = []
+    json_file_names += [each for each in os.listdir(current_dir)
+                       if (each.lower().endswith(".json"))]
+
+    return json_file_names
+
+def printJSONList(file_names: str = []):
+    # Generates a formatted list in the console
+    out = ""
+    for i in range(len(file_names)):
+        out += '(' + str(i+1) + ') ' + file_names[i] + "   "  # 3 spaces
+        if((i + 1) % 3 == 0):
+            out += "\n"
+    out += "\n(a) Generate from all in ascending order\n"
+    print(out)

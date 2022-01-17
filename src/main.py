@@ -1,6 +1,8 @@
 import json
 import random
-from utils import parseData, getAllLatLong
+import time
+import sys
+from utils import getJSONFiles, parseData, getAllLatLong, printJSONList
 from geocodio import GeocodioClient
 from settings import GEOCODIO_API_KEY
 import xlsxwriter
@@ -8,6 +10,41 @@ import xlsxwriter
 # init
 geocodio_client = GeocodioClient(GEOCODIO_API_KEY)
 
+files = getJSONFiles()
+files_length = len(files)
+if files_length <= 0:
+    print("No JSON file found! Exiting...\n")
+    time.sleep(3)
+    sys.exit()
+
+printJSONList(files)
+
+index_arr = []
+valid = False
+while not valid:
+    index_seq = input("Sequence of files for xlsx creation\n").split()
+    valid = True
+    if len(index_seq) == 0:
+        valid = False
+
+    if 'a' in index_seq: # Option to merge all files in ascending order
+        index_seq = range(1, files_length+1)
+
+    for i in index_seq:
+        try:
+            file_num = int(i)
+            if file_num > files_length or file_num < 1:
+                raise Exception()
+            index_arr.append(file_num-1)
+        except Exception:
+            print("Invalid input: " + str(i))
+            print("""     - Make sure to enter a valid number sequence separated by spaces
+     - The numbers must match the file indices
+            """)
+            printJSONList(files)
+            valid = False
+            index_seq = ""
+            index_arr = []
 
 # test
 fileName = "../data/2021_OCTOBER.json"
@@ -49,3 +86,4 @@ for j, line in enumerate(parsed_data):
     worksheet.write_number(row, 4, line["end_point"]["distance"]/1000)
 
 workbook.close()
+sys.exit()
