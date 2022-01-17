@@ -46,15 +46,27 @@ while not valid:
             index_seq = ""
             index_arr = []
 
-# test
-fileName = "../data/2021_OCTOBER.json"
-with open(fileName, 'r', encoding="cp866") as f:
-    data = json.load(f)
+sys.stdout.write("Preparing xlsx file...\n")
 
-parsed_data = parseData(data)
-parsed_data = random.sample(parsed_data, 5)
+data_arr = []
+for i in index_arr:
+    try:
+        f = open(files[i], 'r', encoding="cp866")
+        data = json.load(f)
+    except:
+        print("Error: Could not open " + files[i])
+        print("It will be ignored in the process. \n")
+        continue
+    parsed_data = parseData(data)
+    parsed_data = random.sample(parsed_data, 5) # TODO: remove
+    data_arr.extend(parsed_data)
 
-all_lat_long = getAllLatLong(parsed_data)
+if len(data_arr) <= 0:
+    print("No valid data found! Exiting...\n")
+    time.sleep(3)
+    sys.exit()
+
+all_lat_long = getAllLatLong(data_arr)
 locations = geocodio_client.reverse(all_lat_long)
 
 j = 0
@@ -65,9 +77,12 @@ for i, formatted_address in enumerate(locations.formatted_addresses):
         parsed_data[j]["end_point"]["formatted_address"] = formatted_address
         j += 1
 
+sys.stdout.flush()
+sys.stdout.write = "Done!"
 
+output_name = input("Output name: \n")
 # Create a workbook and add a worksheet.
-workbook = xlsxwriter.Workbook('test.xlsx')
+workbook = xlsxwriter.Workbook(output_name + '.xlsx')
 date_format = workbook.add_format({'num_format': 'dd/mm/yyyy hh:mm:ss'})
 bold_format = workbook.add_format({'bold': True})
 worksheet = workbook.add_worksheet()

@@ -40,13 +40,13 @@ def activityEndPoint(activitySegment_dict):
     end_point = {"trip_id": trip_id, "lat": lat, "lon": lon, "time_stamp": time_stamp, "distance": distance}
     return end_point
 
-#Convert milliseconds timestamp into a readable date.
+# Convert milliseconds timestamp into an excel compatible date.
 def timeStampToExcelDate(milliseconds):
     temp = datetime.datetime(1899, 12, 30)    # Note, not 31st Dec but 30th!
     delta = datetime.datetime.fromtimestamp(milliseconds/1000) - temp
     return float(delta.days) + (float(delta.seconds) / 86400)
 
-#Method to run all the scripts.
+# Method to run all the scripts.
 def parseData(data):
     activity_points = []
     for data_unit in data["timelineObjects"]:
@@ -79,5 +79,5 @@ def printJSONList(file_names: str = []):
         out += '(' + str(i+1) + ') ' + file_names[i] + "   "  # 3 spaces
         if((i + 1) % 3 == 0):
             out += "\n"
-    out += "\n(a) Generate from all in ascending order\n"
+    out += "\n(a) Select all\n"
     print(out)
