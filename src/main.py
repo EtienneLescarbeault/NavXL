@@ -54,15 +54,14 @@ for i in index_arr:
         f = open(files[i], 'r', encoding="cp866")
         data = json.load(f)
     except:
-        print("Error: Could not open " + files[i]+". File is incompatible or corrupted.\n")
+        print("Error: Could not open " + files[i])
         print("It will be ignored in the process. \n")
         continue
     try:
         parsed_data = parseData(data)
-        parsed_data = random.sample(parsed_data, 5)
         data_arr.extend(parsed_data)
     except:
-        print("Error: Could not parse " + files[i] + ". File is incompatible or corrupted.\n")
+        print("Error: Could not parse " + files[i] + ". File is incompatible.\n")
         print("It will be ignored in the process. \n")
         continue
 
