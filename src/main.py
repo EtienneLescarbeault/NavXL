@@ -54,12 +54,17 @@ for i in index_arr:
         f = open(files[i], 'r', encoding="cp866")
         data = json.load(f)
     except:
-        print("Error: Could not open " + files[i])
+        print("Error: Could not open " + files[i]+". File is incompatible or corrupted.\n")
         print("It will be ignored in the process. \n")
         continue
-    parsed_data = parseData(data)
-    parsed_data = random.sample(parsed_data, 5) # TODO: remove
-    data_arr.extend(parsed_data)
+    try:
+        parsed_data = parseData(data)
+        parsed_data = random.sample(parsed_data, 5)
+        data_arr.extend(parsed_data)
+    except:
+        print("Error: Could not parse " + files[i] + ". File is incompatible or corrupted.\n")
+        print("It will be ignored in the process. \n")
+        continue
 
 if len(data_arr) <= 0:
     print("No valid data found! Exiting...\n")
@@ -91,7 +96,6 @@ col_names = ["ID", "Date", "Depart", "Arrivee", "Distance (Km)"]
 for i, c in enumerate(col_names):
     worksheet.write(0, i, c, bold_format)
 
-print(parsed_data)
 for j, line in enumerate(parsed_data):
     row = j + 1
     worksheet.write_number(row, 0, row)
