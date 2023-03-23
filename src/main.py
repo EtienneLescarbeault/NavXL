@@ -8,7 +8,7 @@ from settings import GEOCODIO_API_KEY
 import xlsxwriter
 
 # init
-geocodio_client = GeocodioClient(GEOCODIO_API_KEY)
+#geocodio_client = GeocodioClient(GEOCODIO_API_KEY)
 
 files = getJSONFiles()
 files_length = len(files)
@@ -60,21 +60,33 @@ for i in index_arr:
     try:
         parsed_data = parseData(data)
         data_arr.extend(parsed_data)
-    except:
+    except Exception as e:
+        print(e)
         print("Error: Could not parse " + files[i] + ". File is incompatible.\n")
         print("It will be ignored in the process. \n")
         continue
 
 if len(data_arr) <= 0:
     print("No valid data found! Exiting...\n")
-    time.sleep(3)
+    time.sleep(3)   
     sys.exit()
+print(data_arr[0])
 
-all_lat_long = getAllLatLong(data_arr)
+"""all_lat_long = getAllLatLong(data_arr)
 locations = geocodio_client.reverse(all_lat_long)
+with open('response.json', 'w') as f:
+    json.dump(locations, f)"""
+
+with open('response.json', 'r') as f:
+    locations = json.load(f)
+
+formatted_addresses = []
+for l in locations:
+    formatted_address = l["results"][0]["formatted_address"]
+    formatted_addresses.append(formatted_address)
 
 j = 0
-for i, formatted_address in enumerate(locations.formatted_addresses):
+for i, formatted_address in enumerate(formatted_addresses):
     if i % 2 == 0: # start point
         parsed_data[j]["start_point"]["formatted_address"] = formatted_address
     else: # end point
