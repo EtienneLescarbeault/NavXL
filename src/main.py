@@ -70,7 +70,6 @@ if len(data_arr) <= 0:
     print("No valid data found! Exiting...\n")
     time.sleep(3)   
     sys.exit()
-print(data_arr[0])
 
 """all_lat_long = getAllLatLong(data_arr)
 locations = geocodio_client.reverse(all_lat_long)
@@ -84,13 +83,12 @@ formatted_addresses = []
 for l in locations:
     formatted_address = l["results"][0]["formatted_address"]
     formatted_addresses.append(formatted_address)
-
-j = 0
+j=0
 for i, formatted_address in enumerate(formatted_addresses):
     if i % 2 == 0: # start point
-        parsed_data[j]["start_point"]["formatted_address"] = formatted_address
+        data_arr[j]["start_point"]["formatted_address"] = formatted_address
     else: # end point
-        parsed_data[j]["end_point"]["formatted_address"] = formatted_address
+        data_arr[j]["end_point"]["formatted_address"] = formatted_address
         j += 1
 
 sys.stdout.flush()
@@ -107,7 +105,7 @@ col_names = ["ID", "Date", "Depart", "Arrivee", "Distance (Km)"]
 for i, c in enumerate(col_names):
     worksheet.write(0, i, c, bold_format)
 
-for j, line in enumerate(parsed_data):
+for j, line in enumerate(data_arr):
     row = j + 1
     worksheet.write_number(row, 0, row)
     worksheet.write(row, 1, line["start_point"]["time_stamp"], date_format)
