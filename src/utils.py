@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import time
 
 """
 Adapted from https://github.com/gabrielgz92/location_history_data/blob/master/key_value_parsing.py
@@ -10,7 +11,7 @@ def parse_time(time_str):
     formats = ["%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S.%fZ"]
     for f in formats:
         try:
-            return int(datetime.datetime.strptime(time_str, f).utcnow().timestamp())
+            return int(time.mktime(datetime.datetime.strptime(time_str, f).timetuple()))
         except ValueError:
             pass
     raise ValueError("No valid date format found.")
@@ -27,8 +28,8 @@ def activityStartPoint(activitySegment_dict):
     lat = activitySegment_dict["startLocation"]["latitudeE7"]
     lon = activitySegment_dict["startLocation"]["longitudeE7"]
     # matches 2022-10-01T13:31:22Z
-    trip_id = int(parse_time(trip_id))
-    time_stamp = timeStampToExcelDate(int(trip_id))
+    trip_id = parse_time(trip_id)
+    time_stamp = timeStampToExcelDate(trip_id)
     distance = activitySegment_dict.get("distance", 0)
 
     #Formatting variables
@@ -53,10 +54,8 @@ def activityEndPoint(activitySegment_dict):
     return end_point
 
 # Convert milliseconds timestamp into an excel compatible date.
-def timeStampToExcelDate(milliseconds):
-    temp = datetime.datetime(1899, 12, 30)    # Note, not 31st Dec but 30th!
-    delta = datetime.datetime.fromtimestamp(milliseconds/1000) - temp
-    return float(delta.days) + (float(delta.seconds) / 86400)
+def timeStampToExcelDate(unix_timestamp):
+    return (unix_timestamp / 86400) + 25569 + 1
 
 # Method to run all the scripts.
 def parseData(data):
