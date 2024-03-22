@@ -3,10 +3,6 @@ import os
 import sys
 import time
 
-"""
-Adapted from https://github.com/gabrielgz92/location_history_data/blob/master/key_value_parsing.py
-"""
-
 def parse_time(time_str):
     formats = ["%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S.%fZ"]
     for f in formats:
@@ -16,48 +12,9 @@ def parse_time(time_str):
             pass
     raise ValueError("No valid date format found.")
 
-#Returns a list of all the waypoints of a activity.
-def activitySegment(activitySegment_dict):
-    start_point = activityStartPoint(activitySegment_dict)
-    end_point = activityEndPoint(activitySegment_dict)
-    return {"start_point": start_point, "end_point": end_point}
-
-#Set start point of activity as a list.
-def activityStartPoint(activitySegment_dict):
-    trip_id = activitySegment_dict["duration"]["startTimestamp"]
-    lat = activitySegment_dict["startLocation"]["latitudeE7"]
-    lon = activitySegment_dict["startLocation"]["longitudeE7"]
-    # matches 2022-10-01T13:31:22Z
-    trip_id = parse_time(trip_id)
-    time_stamp = timeStampToExcelDate(trip_id)
-    distance = activitySegment_dict.get("distance", 0)
-
-    #Formatting variables
-    lat = int(lat)/1e7
-    lon = int(lon)/1e7
-    start_point = {"trip_id": trip_id, "lat": lat, "lon": lon, "time_stamp": time_stamp, "distance": distance}
-    return start_point
-
-#Set end point of activity as a list.
-def activityEndPoint(activitySegment_dict):
-    trip_id = activitySegment_dict["duration"]["startTimestamp"]
-    lat = activitySegment_dict["endLocation"]["latitudeE7"]
-    lon = activitySegment_dict["endLocation"]["longitudeE7"]
-    time_stamp = activitySegment_dict["duration"]["endTimestamp"]
-    distance = activitySegment_dict.get("distance", 0)
-    #Formatting variables
-    lat = int(lat)/1e7
-    lon = int(lon)/1e7
-    trip_id = parse_time(trip_id)
-    time_stamp = timeStampToExcelDate(trip_id)
-    end_point = {"trip_id": trip_id, "lat": lat, "lon": lon, "time_stamp": time_stamp, "distance": distance}
-    return end_point
-
 # Convert milliseconds timestamp into an excel compatible date.
 def timeStampToExcelDate(unix_timestamp):
     return (unix_timestamp / 86400) + 25569 + 1
-
-
 
 def getJSONFiles():
     current_dir = sys.argv[1]

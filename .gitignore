@@ -4,4 +4,4 @@ data
 *.json
 *.pyc
 .vscode
-*.cpython-38.pyc
+__pycache__
