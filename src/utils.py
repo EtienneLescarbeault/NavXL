@@ -57,23 +57,7 @@ def activityEndPoint(activitySegment_dict):
 def timeStampToExcelDate(unix_timestamp):
     return (unix_timestamp / 86400) + 25569 + 1
 
-# Method to run all the scripts.
-def parseData(data):
-    activity_points = []
-    for data_unit in data["timelineObjects"]:
-        if "activitySegment" in data_unit.keys():
-            activity_points.append(activitySegment(data_unit["activitySegment"]))
-    return activity_points
 
-def getAllLatLong(parsed_data):
-    """
-    Alternates between start and end points of each activity segment.
-    """
-    lat_lon = []
-    for point in parsed_data:
-        lat_lon.append((point["start_point"]["lat"], point["start_point"]["lon"]))
-        lat_lon.append((point["end_point"]["lat"], point["end_point"]["lon"]))
-    return lat_lon
 
 def getJSONFiles():
     current_dir = sys.argv[1]
@@ -81,7 +65,7 @@ def getJSONFiles():
     json_file_names += [each for each in os.listdir(current_dir)
                        if (each.lower().endswith(".json"))]
 
-    return json_file_names
+    return json_file_names, current_dir
 
 def printJSONList(file_names: str = []):
     # Generates a formatted list in the console
@@ -92,3 +76,33 @@ def printJSONList(file_names: str = []):
             out += "\n"
     out += "\n(a) Select all\n"
     print(out)
+    
+def input_json_files(files: list):
+    files_length = len(files)
+    index_arr = []
+    valid = False
+    while not valid:
+        index_seq = input("Sequence of files for xlsx creation\n").split()
+        valid = True
+        if len(index_seq) == 0:
+            valid = False
+
+        if 'a' in index_seq: # Option to merge all files in ascending order
+            index_seq = range(1, files_length+1)
+
+        for i in index_seq:
+            try:
+                file_num = int(i)
+                if file_num > files_length or file_num < 1:
+                    raise Exception()
+                index_arr.append(file_num-1)
+            except Exception:
+                print("Invalid input: " + str(i))
+                print("""     - Make sure to enter a valid number sequence separated by spaces
+        - The numbers must match the file indices
+                """)
+                printJSONList(files)
+                valid = False
+                index_seq = ""
+                index_arr = []
+    return index_arr
