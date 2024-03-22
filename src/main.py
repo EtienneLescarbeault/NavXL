@@ -42,10 +42,9 @@ for i in chosen_files_ids:
             if 'activitySegment' not in timeline_objs[i]:
                 continue
             act = timeline_objs[i]['activitySegment']
-            distance_m = 0.0
+            distance_km = 0.0
             if 'distance' in act:
-                distance_m = act['distance']
-            distance_m = distance_m / 1000
+                distance_km = act['distance'] / 1000
             start_date = act['duration']['startTimestamp'].split('T')[0]
             
             start_lat = act['startLocation']['latitudeE7'] / 1e7
@@ -62,11 +61,10 @@ for i in chosen_files_ids:
             start_address = locations.formatted_addresses[0]
             end_address = locations.formatted_addresses[1] 
             
-            #worsheet.write_number(row, 0, row)
             worsheet.write(row, 0, start_date, date_format)
             worsheet.write_string(row, 1, start_address)
             worsheet.write_string(row, 2, end_address)
-            worsheet.write_number(row, 3, distance_m)
+            worsheet.write_number(row, 3, distance_km)
             row += 1
 workbook.close()
 print("File created successfully!")
