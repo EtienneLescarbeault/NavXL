@@ -4,4 +4,5 @@ data
 *.json
 *.pyc
 .vscode
+src/filter_files.py
 __pycache__
