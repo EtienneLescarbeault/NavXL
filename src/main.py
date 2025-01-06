@@ -1,5 +1,4 @@
 import json
-import random
 import time
 import sys
 from utils import getJSONFiles, printJSONList, input_json_files
@@ -7,7 +6,13 @@ import xlsxwriter
 import os
 from geocodio import GeocodioClient
 from settings import GEOCODIO_API_KEY
-from tqdm import tqdm, trange
+from tqdm import trange
+
+
+def latlng_to_float(coord_string: str) -> tuple[float, float]:
+    lat_str, lon_str = coord_string .replace('°', '').split(', ')
+    return (float(lat_str), float(lon_str))
+    
 
 geocodio_client = GeocodioClient(GEOCODIO_API_KEY)
 
@@ -31,33 +36,35 @@ col_names = ["date", "start_address", "end_address", "distance_km"]
 for i, col_name in enumerate(col_names):
     worsheet.write(0, i, col_name, bold_format)
 
-# December has a missing activitySegment key
 row = 1
 for i in chosen_files_ids:
     file_path = os.path.join(root, available_files[i])
     with open(file_path, 'r', encoding='utf8') as f:
         data = json.load(f)
-        timeline_objs = data['timelineObjects']
-        for i in trange(0, len(timeline_objs), postfix=f"{available_files[i]}"):
-            if 'activitySegment' not in timeline_objs[i]:
+        semantic_segments = data['semanticSegments']
+        for i in trange(0, len(semantic_segments), postfix=f"{available_files[i]}"):
+            seg = semantic_segments[i]
+
+            if 'activity' not in seg:
                 continue
-            act = timeline_objs[i]['activitySegment']
+            act = seg['activity']
+            
+            if act['topCandidate']['type'] != 'IN_PASSENGER_VEHICLE':
+                continue
+    
             distance_km = 0.0
-            if 'distance' in act:
-                distance_km = act['distance'] / 1000
-            start_date = act['duration']['startTimestamp'].split('T')[0]
+            if 'distanceMeters' in act:
+                distance_km = act['distanceMeters'] / 1000
+            start_date = seg['startTime'].split('T')[0]
             
-            start_lat = act['startLocation']['latitudeE7'] / 1e7
-            start_long = act['startLocation']['longitudeE7'] / 1e7
-            
-            
-            end_lat = act['endLocation']['latitudeE7'] / 1e7
-            end_long = act['endLocation']['longitudeE7'] / 1e7  # should correspond to placeVisit
+            start_lat, start_long = latlng_to_float(act['start']['latLng'])            
+            end_lat, end_long = latlng_to_float(act['end']['latLng'])
             
             locations = geocodio_client.reverse([
                 (start_lat, start_long),
                 (end_lat, end_long)
             ])      
+
             start_address = locations.formatted_addresses[0]
             end_address = locations.formatted_addresses[1] 
             
